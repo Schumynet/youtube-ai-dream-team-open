@@ -1,0 +1,132 @@
+{
+    "name": "Automazione Fliki & YouTube",
+    "flow": [
+        {
+            "id": 1,
+            "module": "airtable:WatchRecords",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6561861,
+                "limit": 10,
+                "viewId": "viw9l5KpxgYV4mU3Z"
+            },
+            "mapper": {
+                "base": "appe0zESHh6yDpJoZ",
+                "table": "tbl4764wQlb45Fpt3",
+                "formula": "{Status} = 'Da Fare'"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0,
+                    "name": "Cerca Record 'Da Fare'"
+                }
+            }
+        },
+        {
+            "id": 20,
+            "module": "fliki:Create",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6554522
+            },
+            "mapper": {
+                "payload_0_format": "9:16",
+                "payload_0_voiceId": "63032cc62b2fcbc76d8b9415",
+                "payload_0_content": "{{1.Script}}",
+                "payload_0_audioUrl": "",
+                "payload_0_shouldExport": true,
+                "payload_0_voiceStyleId": "",
+                "payload_0_campaignVideoId": ""
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0,
+                    "name": "Genera Video Fliki"
+                }
+            }
+        },
+        {
+            "id": 21,
+            "module": "openai-gpt-3:CreateCompletion",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6445582
+            },
+            "mapper": {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Sei un esperto di crescita su YouTube. Il tuo compito è generare un titolo accattivante, virale e ad alto CTR per un video short basato sullo script fornito. Restituisci SOLO il titolo, senza virgolette o spiegazioni."
+                    },
+                    {
+                        "role": "user",
+                        "content": "{{1.Script}}"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": -150,
+                    "name": "Genera Titolo YouTube"
+                }
+            }
+        },
+        {
+            "id": 22,
+            "module": "openai-gpt-3:CreateCompletion",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6445582
+            },
+            "mapper": {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Sei un esperto SEO per YouTube Shorts. Scrivi una descrizione breve (max 3 righe) ottimizzata per la ricerca, includendo hashtag rilevanti, basandoti sul seguente script."
+                    },
+                    {
+                        "role": "user",
+                        "content": "{{1.Script}}"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 150,
+                    "name": "Genera Descrizione SEO"
+                }
+            }
+        },
+        {
+            "id": 23,
+            "module": "airtable:ActionUpdateRecord",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 6561861
+            },
+            "mapper": {
+                "base": "appe0zESHh6yDpJoZ",
+                "table": "tbl4764wQlb45Fpt3",
+                "recordId": "{{1.id}}",
+                "fields": {
+                    "Youtube title": "{{21.choices[].message.content}}",
+                    "Youtube description": "{{22.choices[].message.content}}",
+                    "Status": "Pronto"
+                }
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 0,
+                    "name": "Aggiorna Airtable e Chiudi"
+                }
+            }
+        }
+    ]
+}

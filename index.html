@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Dream Team — Command Center</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06080e;--card:rgba(12,16,28,.92);--border:rgba(80,120,255,.12);
+  --glow:#4a6cf7;--glow2:#9333ea;--glow3:#06b6d4;--glow4:#f97316;--glow5:#22c55e;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+  --r:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 600px 400px at 15% 20%,rgba(74,108,247,.07),transparent),
+    radial-gradient(ellipse 500px 500px at 85% 60%,rgba(147,51,234,.05),transparent),
+    radial-gradient(ellipse 400px 300px at 50% 90%,rgba(6,182,212,.04),transparent);
+}
+.app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:20px 16px 80px}
+/* GRID BG */
+.grid-bg{position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(74,108,247,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(74,108,247,.03) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:16px;padding:14px 24px;
+  background:rgba(6,8,14,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);border-radius:var(--r);margin-bottom:32px}
+nav .logo{font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--glow),var(--glow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav .links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav a{color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;transition:.2s}
+nav a:hover{color:var(--text);background:rgba(255,255,255,.06)}
+
+/* HEADER */
+.hero{text-align:center;padding:40px 20px 48px;position:relative}
+.hero h1{font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.1;margin-bottom:12px}
+.hero h1 span{background:linear-gradient(135deg,var(--glow),var(--glow2),var(--glow3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text2);font-size:16px;max-width:600px;margin:0 auto 28px;line-height:1.6}
+.stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-n{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--glow),var(--glow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-l{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* SECTIONS */
+.sec{margin:48px 0 20px}
+.sec-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.sec-title::before{content:'';width:3px;height:14px;border-radius:2px;background:var(--glow)}
+
+/* GRID */
+.g{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.g4{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+/* CARD BASE */
+.c{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;backdrop-filter:blur(8px);transition:.3s;position:relative;overflow:hidden}
+.c:hover{border-color:rgba(80,120,255,.25);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.c::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c-accent,var(--glow)),transparent);opacity:0;transition:.3s}
+.c:hover::after{opacity:1}
+
+/* DEPT COLORS */
+.c.strat{--c-accent:#4a6cf7}.c.preprod{--c-accent:#0ea5e9}.c.prod{--c-accent:#a855f7}
+.c.dist{--c-accent:#f97316}.c.eng{--c-accent:#22c55e}.c.mon{--c-accent:#eab308}.c.orc{--c-accent:#ec4899}
+.c.tool{--c-accent:#06b6d4}.c.pipe{--c-accent:#f43f5e}
+
+/* AGENT CARD */
+.ag{padding:14px 16px}
+.ag-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ag-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.c.strat .ag-num{background:rgba(74,108,247,.15);color:#4a6cf7}
+.c.preprod .ag-num{background:rgba(14,165,233,.15);color:#0ea5e9}
+.c.prod .ag-num{background:rgba(168,85,247,.15);color:#a855f7}
+.c.dist .ag-num{background:rgba(249,115,22,.15);color:#f97316}
+.c.eng .ag-num{background:rgba(34,197,94,.15);color:#22c55e}
+.c.mon .ag-num{background:rgba(234,179,8,.15);color:#eab308}
+.c.orc .ag-num{background:rgba(236,72,153,.15);color:#ec4899}
+.ag-name{font-size:13px;font-weight:700;line-height:1.3}
+.ag-out{font-size:11px;color:var(--text3);margin-top:4px;padding-left:38px}
+
+/* DEPT HEADER */
+.dept-hd{padding:18px 20px;display:flex;align-items:center;gap:14px}
+.dept-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.dept-hd h3{font-size:16px;font-weight:700}
+.dept-hd .sub{font-size:12px;color:var(--text3);margin-top:2px}
+
+/* TOOL CARD */
+.tl{padding:18px 20px;display:flex;flex-direction:column}
+.tl-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.tl-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.tl-title{font-size:15px;font-weight:700}
+.tl-desc{font-size:12px;color:var(--text2);line-height:1.6;flex:1;margin-bottom:14px}
+.tl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.tag{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--text2)}
+.tag.on{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.2);color:#22c55e}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;transition:.2s;cursor:pointer;border:none}
+.btn-p{background:linear-gradient(135deg,var(--c-accent,var(--glow)),rgba(74,108,247,.7));color:#fff}
+.btn-p:hover{filter:brightness(1.2)}
+.btn-s{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text2)}
+.btn-s:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+
+/* PIPELINE FLOW */
+.flow{padding:20px}
+.flow-step{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.flow-step:last-child{border-bottom:none}
+.flow-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;border:2px solid}
+.flow-info{flex:1}
+.flow-name{font-size:13px;font-weight:600}
+.flow-desc{font-size:11px;color:var(--text3)}
+.flow-arrow{color:var(--text3);font-size:10px;padding:2px 0}
+
+/* FLOW COLORS */
+.n8n .flow-num{border-color:#f43f5e;color:#f43f5e}
+.make .flow-num{border-color:#f97316;color:#f97316}
+.ai .flow-num{border-color:var(--glow2);color:var(--glow2)}
+
+/* WORKFLOW DIAGRAM */
+.diagram{padding:24px;background:rgba(6,8,14,.5);border:1px solid var(--border);border-radius:var(--r);margin:20px 0;overflow-x:auto}
+.diagram svg{min-width:100%}
+
+/* SECRETS */
+.keys{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px}
+.krow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.02);font-size:13px}
+.krow:last-child{border-bottom:none}
+.k-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0}
+.k-label{width:100px;font-weight:600;flex-shrink:0;font-size:12px}
+.k-val{flex:1;font-family:'Courier New',monospace;font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* SCRIPT BOX */
+.sbox{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:14px 16px;font-family:'Courier New',monospace;font-size:12px;color:var(--text3);line-height:1.8;white-space:pre-wrap;word-break:break-all}
+
+/* ANIM */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.c,.ag,.tl{animation:fadeUp .4s ease backwards}
+
+/* FOOTER */
+footer{text-align:center;padding:48px 0 20px;color:var(--text3);font-size:12px;border-top:1px solid var(--border)}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  nav{flex-direction:column;text-align:center}
+  nav .links{justify-content:center}
+  .stats{gap:20px}
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<div class="app">
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="logo">&#x1F916; Dream Team</div>
+  <div class="links">
+    <a href="#agenti">Agenti</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#tools">Tools</a>
+    <a href="#keys">Keys</a>
+    <a href="#scripts">Scripts</a>
+    <a href="https://github.com/YOUR_USERNAME/youtube-ai-dream-team" target="_blank">&#x1F4BB; Repo</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <h1><span>AI Dream Team</span><br>Command Center</h1>
+  <p>Il cervello della tua automazione YouTube — 34 agenti AI specialistici, 2 pipeline validate, 7 API connesse, sistema di memoria persistente su GitHub.</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">34</div><div class="stat-l">Agenti AI</div></div>
+    <div class="stat"><div class="stat-n">7</div><div class="stat-l">Dipartimenti</div></div>
+    <div class="stat"><div class="stat-n">2</div><div class="stat-l">Pipeline</div></div>
+    <div class="stat"><div class="stat-n">7</div><div class="stat-l">API Attive</div></div>
+    <div class="stat"><div class="stat-n">34</div><div class="stat-l">SOP Files</div></div>
+    <div class="stat"><div class="stat-n">58</div><div class="stat-l">Repo GitHub</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: AGENTI -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec" id="agenti"><div class="sec-title">I 34 Agenti — 7 Dipartimenti</div></div>
+
+<!-- DEPT A: STRATEGY -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c strat dept-hd">
+    <div class="dept-icon">&#x2699;&#xFE0F;</div>
+    <div><h3>Dept A — Strategia &amp; Ideazione</h3><div class="sub">6 agenti · Fondazione del canale, SEO, nicchia, audience</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c strat ag"><div class="ag-top"><div class="ag-num">01</div><div class="ag-name">YouTube Channel Architect</div></div><div class="ag-out">&#x1F4CB; Documento strategia canale</div></div>
+  <div class="c strat ag"><div class="ag-top"><div class="ag-num">02</div><div class="ag-name">Niche &amp; Competitor Analyst</div></div><div class="ag-out">&#x1F4CA; Report gap competitor</div></div>
+  <div class="c strat ag"><div class="ag-top"><div class="ag-num">03</div><div class="ag-name">Viral Topic Ideation Engine</div></div><div class="ag-out">&#x1F4A1; Bank idee video settimanale</div></div>
+  <div class="c strat ag"><div class="ag-top"><div class="ag-num">04</div><div class="ag-name">Keyword &amp; SEO Strategist</div></div><div class="ag-out">&#x1F50D; Foglio ricerca keyword</div></div>
+  <div class="c strat ag"><div class="ag-top"><div class="ag-num">05</div><div class="ag-name">Title &amp; Thumbnail Concept Generator</div></div><div class="ag-out">&#x1F3A8; Brief titolo/thumbnail</div></div>
+  <div class="c strat ag"><div class="ag-top"><div class="ag-num">06</div><div class="ag-name">Audience Avatar Builder</div></div><div class="ag-out">&#x1F464; Documento persona viewer</div></div>
+</div>
+
+<!-- DEPT B: PRE-PRODUCTION -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c preprod dept-hd">
+    <div class="dept-icon">&#x1F4DD;</div>
+    <div><h3>Dept B — Pre-Produzione &amp; Copione</h3><div class="sub">5 agenti · Ricerca, script, storyboard, retention</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c preprod ag"><div class="ag-top"><div class="ag-num">07</div><div class="ag-name">Hook &amp; Intro Writer</div></div><div class="ag-out">&#x1F3AF; Hook + intro testuali</div></div>
+  <div class="c preprod ag"><div class="ag-top"><div class="ag-num">08</div><div class="ag-name">Core Script &amp; Storyboard Writer</div></div><div class="ag-out">&#x1F4DC; Script completo + storyboard</div></div>
+  <div class="c preprod ag"><div class="ag-top"><div class="ag-num">09</div><div class="ag-name">Retention &amp; Pacing Optimiser</div></div><div class="ag-out">&#x23F1; Analisi pacing e retention</div></div>
+  <div class="c preprod ag"><div class="ag-top"><div class="ag-num">10</div><div class="ag-name">Shot List &amp; B-Roll Planner</div></div><div class="ag-out">&#x1F3AC; Shot list dettagliata</div></div>
+  <div class="c preprod ag"><div class="ag-top"><div class="ag-num">11</div><div class="ag-name">Call-to-Action Strategist</div></div><div class="ag-out">&#x1F517; CTA ottimizzati</div></div>
+</div>
+
+<!-- DEPT C: PRODUCTION -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c prod dept-hd">
+    <div class="dept-icon">&#x1F3B5;</div>
+    <div><h3>Dept C — Produzione &amp; Post-Produzione</h3><div class="sub">5 agenti · Thumbnail, montaggio, voiceover, musica</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c prod ag"><div class="ag-top"><div class="ag-num">12</div><div class="ag-name">Metadata &amp; Description Writer</div></div><div class="ag-out">&#x1F4D3; Descrizione ottimizzata</div></div>
+  <div class="c prod ag"><div class="ag-top"><div class="ag-num">13</div><div class="ag-name">Thumbnail Design Director</div></div><div class="ag-out">&#x1F5BC; Direttiva thumbnail</div></div>
+  <div class="c prod ag"><div class="ag-top"><div class="ag-num">14</div><div class="ag-name">Video Editing Director</div></div><div class="ag-out">&#x1F3A5; Direttiva montaggio</div></div>
+  <div class="c prod ag"><div class="ag-top"><div class="ag-num">15</div><div class="ag-name">Audio &amp; Sound Design Consultant</div></div><div class="ag-out">&#x1F3B5; Soundtrack + voiceover</div></div>
+  <div class="c prod ag"><div class="ag-top"><div class="ag-num">16</div><div class="ag-name">Subtitle &amp; Caption Optimiser</div></div><div class="ag-out">&#x1F4DD; Sottotitoli ottimizzati</div></div>
+</div>
+
+<!-- DEPT D: DISTRIBUTION -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c dist dept-hd">
+    <div class="dept-icon">&#x1F680;</div>
+    <div><h3>Dept D — Distribuzione &amp; Repurposing</h3><div class="sub">5 agenti · Upload, Shorts, cross-platform, newsletter</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c dist ag"><div class="ag-top"><div class="ag-num">17</div><div class="ag-name">Upload &amp; Publishing Coordinator</div></div><div class="ag-out">&#x1F4E4; Schedule + upload</div></div>
+  <div class="c dist ag"><div class="ag-top"><div class="ag-num">18</div><div class="ag-name">YouTube Shorts Creator</div></div><div class="ag-out">&#x1F3AC; Clip verticali</div></div>
+  <div class="c dist ag"><div class="ag-top"><div class="ag-num">19</div><div class="ag-name">Cross-Platform Repurposing Agent</div></div><div class="ag-out">&#x1F310; TikTok, Reels, X...</div></div>
+  <div class="c dist ag"><div class="ag-top"><div class="ag-num">20</div><div class="ag-name">Community Tab Strategist</div></div><div class="ag-out">&#x1F4E2; Post community</div></div>
+  <div class="c dist ag"><div class="ag-top"><div class="ag-num">21</div><div class="ag-name">Newsletter Integration Specialist</div></div><div class="ag-out">&#x1F4E9; Email newsletter</div></div>
+</div>
+
+<!-- DEPT E: ENGAGEMENT -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c eng dept-hd">
+    <div class="dept-icon">&#x1F4AC;</div>
+    <div><h3>Dept E — Engagement &amp; Community</h3><div class="sub">4 agenti · Commenti, sentiment, superfan, outreach</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c eng ag"><div class="ag-top"><div class="ag-num">22</div><div class="ag-name">Comment Moderation &amp; Reply Engine</div></div><div class="ag-out">&#x1F4AC; Risposte AI commenti</div></div>
+  <div class="c eng ag"><div class="ag-top"><div class="ag-num">23</div><div class="ag-name">Viewer Sentiment Analyst</div></div><div class="ag-out">&#x1F9E0; Analisi sentiment</div></div>
+  <div class="c eng ag"><div class="ag-top"><div class="ag-num">24</div><div class="ag-name">Superfan Identification Agent</div></div><div class="ag-out">&#x2B50; ID superfan</div></div>
+  <div class="c eng ag"><div class="ag-top"><div class="ag-num">25</div><div class="ag-name">Collaboration &amp; Outreach Scout</div></div><div class="ag-out">&#x1F91D; Opportunita collab</div></div>
+</div>
+
+<!-- DEPT F: MONETIZATION -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c mon dept-hd">
+    <div class="dept-icon">&#x1F4B0;</div>
+    <div><h3>Dept F — Analytics &amp; Monetizzazione</h3><div class="sub">5 agenti · Sponsor, analytics, funnel, A/B testing</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c mon ag"><div class="ag-top"><div class="ag-num">26</div><div class="ag-name">Lead Generation &amp; Funnel Architect</div></div><div class="ag-out">&#x1F3AF; Funnel conversione</div></div>
+  <div class="c mon ag"><div class="ag-top"><div class="ag-num">27</div><div class="ag-name">Sponsorship &amp; Brand Deal Negotiator</div></div><div class="ag-out">&#x1F4BC; Deal sponsor</div></div>
+  <div class="c mon ag"><div class="ag-top"><div class="ag-num">28</div><div class="ag-name">YouTube Analytics Interpreter</div></div><div class="ag-out">&#x1F4C8; Report analytics</div></div>
+  <div class="c mon ag"><div class="ag-top"><div class="ag-num">29</div><div class="ag-name">A/B Testing Coordinator</div></div><div class="ag-out">&#x1F9CA; Test A/B</div></div>
+  <div class="c mon ag"><div class="ag-top"><div class="ag-num">30</div><div class="ag-name">Revenue &amp; ROI Tracker</div></div><div class="ag-out">&#x1F4C9; Revenue tracking</div></div>
+</div>
+
+<!-- DEPT G: ORCHESTRATION -->
+<div class="g g2" style="margin-bottom:14px">
+  <div class="c orc dept-hd">
+    <div class="dept-icon">&#x1F916;</div>
+    <div><h3>Dept G — Intelligence &amp; Orchestration</h3><div class="sub">4 agenti · Master analyzer, validatori, memoria</div></div>
+  </div>
+</div>
+<div class="g g3" style="margin-bottom:28px">
+  <div class="c orc ag"><div class="ag-top"><div class="ag-num">31</div><div class="ag-name">Master Video Analyzer &amp; Orchestrator</div></div><div class="ag-out">&#x1F3AF; Coordina tutti gli agenti</div></div>
+  <div class="c orc ag"><div class="ag-top"><div class="ag-num">32</div><div class="ag-name">n8n Workflow Validator</div></div><div class="ag-out">&#x2705; 8-check validation n8n</div></div>
+  <div class="c orc ag"><div class="ag-top"><div class="ag-num">33</div><div class="ag-name">Make.com Workflow Validator</div></div><div class="ag-out">&#x2705; Pipeline v2.0 validata</div></div>
+  <div class="c orc ag"><div class="ag-top"><div class="ag-num">34</div><div class="ag-name">Memory Manager — GitHub-First</div></div><div class="ag-out">&#x1F4BE; Memoria persistente repo</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: PIPELINE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec" id="pipeline"><div class="sec-title">Pipeline di Automazione — Il Cervello Operativo</div></div>
+
+<div class="g g2">
+  <!-- n8n VIP16 -->
+  <div class="c pipe">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.2);display:flex;align-items:center;justify-content:center;font-size:18px">&#x2699;&#xFE0F;</div>
+      <div>
+        <div style="font-size:16px;font-weight:700">n8n VIP16 Pipeline</div>
+        <div style="font-size:11px;color:var(--text3)">Workflow automatizzato YouTube — 8 nodi</div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-info"><div class="flow-name">YouTube Trigger</div><div class="flow-desc">Nuovo video o scheduled check</div></div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-info"><div class="flow-name">SEO Analyzer</div><div class="flow-desc">Analisi keyword e trend</div></div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-info"><div class="flow-name">LLM Script Generator</div><div class="flow-desc">OpenRouter → GPT-4 per script</div></div></div>
+      <div class="flow-step"><div class="flow-num">4</div><div class="flow-info"><div class="flow-name">Fliki Video Generator</div><div class="flow-desc">Text-to-video con voiceover</div></div></div>
+      <div class="flow-step"><div class="flow-num">5</div><div class="flow-info"><div class="flow-name">YouTube Upload</div><div class="flow-desc">Titolo, descrizione, tag, thumbnail</div></div></div>
+      <div class="flow-step"><div class="flow-num">6</div><div class="flow-info"><div class="flow-name">Engagement Bot</div><div class="flow-desc">Auto-reply commenti</div></div></div>
+      <div class="flow-step"><div class="flow-num">7</div><div class="flow-info"><div class="flow-name">Analytics Collector</div><div class="flow-desc">Raccoglie metriche performance</div></div></div>
+      <div class="flow-step"><div class="flow-num">8</div><div class="flow-info"><div class="flow-name">Loop Router</div><div class="flow-desc">Decide se ottimizzare o creare nuovo</div></div></div>
+    </div>
+    <div class="tl-tags"><span class="tag">Agent 32 validato</span><span class="tag">8 bug trovati</span><span class="tag">Self-hosted</span></div>
+  </div>
+
+  <!-- Make.com v2.0 -->
+  <div class="c pipe">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.2);display:flex;align-items:center;justify-content:center;font-size:18px">&#x1F527;</div>
+      <div>
+        <div style="font-size:16px;font-weight:700">Make.com Pipeline v2.0</div>
+        <div style="font-size:11px;color:var(--text3)">Fliki &amp; YouTube — 8 moduli validati</div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-info"><div class="flow-name">Webhook Trigger</div><div class="flow-desc">Attivazione esterna o scheduling</div></div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-info"><div class="flow-name">OpenRouter LLM</div><div class="flow-desc">Genera script con GPT-4/Claude</div></div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-info"><div class="flow-name">Text Parser</div><div class="flow-desc">Estrae sezioni per Fliki</div></div></div>
+      <div class="flow-step"><div class="flow-num">4</div><div class="flow-info"><div class="flow-name">Fliki Video</div><div class="flow-desc">Genera video con voce AI</div></div></div>
+      <div class="flow-step"><div class="flow-num">5</div><div class="flow-info"><div class="flow-name">YouTube Upload</div><div class="flow-desc">Pubblica su canale YouTube</div></div></div>
+      <div class="flow-step"><div class="flow-num">6</div><div class="flow-info"><div class="flow-name">Airtable Logger</div><div class="flow-desc">Registra in database</div></div></div>
+      <div class="flow-step"><div class="flow-num">7</div><div class="flow-info"><div class="flow-name">Error Handler</div><div class="flow-desc">Catch + retry + notify</div></div></div>
+      <div class="flow-step"><div class="flow-num">8</div><div class="flow-info"><div class="flow-name">HTTP Response</div><div class="flow-desc">Conferma completamento</div></div></div>
+    </div>
+    <div class="tl-tags"><span class="tag">Agent 33 validato</span><span class="tag">v2.0</span><span class="tag">Fix critico: choices.1</span></div>
+  </div>
+</div>
+
+<!-- WORKFLOW MASTER FLOW -->
+<div class="diagram">
+  <div style="text-align:center;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:16px">FLUSSO MASTER — DALL'IDEA AL VIDEO PUBBLICATO</div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;font-size:11px">
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(74,108,247,.15);color:#4a6cf7;font-weight:600">Dept A<br>Strategia</span>
+    <span style="color:var(--text3)">&#x2192;</span>
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(14,165,233,.15);color:#0ea5e9;font-weight:600">Dept B<br>Script</span>
+    <span style="color:var(--text3)">&#x2192;</span>
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(168,85,247,.15);color:#a855f7;font-weight:600">Dept C<br>Produzione</span>
+    <span style="color:var(--text3)">&#x2192;</span>
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(249,115,22,.15);color:#f97316;font-weight:600">Dept D<br>Distribuzione</span>
+    <span style="color:var(--text3)">&#x2192;</span>
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(34,197,94,.15);color:#22c55e;font-weight:600">Dept E<br>Engagement</span>
+    <span style="color:var(--text3)">&#x2192;</span>
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(234,179,8,.15);color:#eab308;font-weight:600">Dept F<br>Analytics</span>
+    <span style="color:var(--text3)">&#x2192;</span>
+    <span style="padding:6px 12px;border-radius:8px;background:rgba(236,72,153,.15);color:#ec4899;font-weight:600">Dept G<br>Orchestrazione</span>
+  </div>
+  <div style="text-align:center;font-size:10px;color:var(--text3);margin-top:10px">Ogni dipartimento riceve output dal precedente e passa al successivo — ciclo continuo ottimizzato da Agent 31</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: TOOLS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec" id="tools"><div class="sec-title">Strumentazioni — API &amp; Piattaforme</div></div>
+
+<div class="g g3">
+  <!-- Super Z Chat -->
+  <div class="c tool" style="--c-accent:var(--glow)">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(74,108,247,.12);border:1px solid rgba(74,108,247,.2)">&#x1F916;</div>
+        <div><div class="tl-title">Super Z AI Chat</div></div>
+      </div>
+      <div class="tl-desc">Assistente AI primario. Modello GLM con 30+ skill: coding, documenti, video, analisi, automazione, web browsing.</div>
+      <div class="tl-tags"><span class="tag on">Online</span><span class="tag">GLM-4</span><span class="tag">30+ Skills</span></div>
+      <div class="btn-row"><a href="https://chat.z.ai" target="_blank" class="btn btn-p">&#x1F517; chat.z.ai</a></div>
+    </div>
+  </div>
+
+  <!-- GitHub -->
+  <div class="c tool" style="--c-accent:#f97316">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.2)">&#x1F4BB;</div>
+        <div><div class="tl-title">GitHub</div></div>
+      </div>
+      <div class="tl-desc">Versioning + hosting. Strategia GitHub-First con sistema anti-disconnessione 3 livelli. Repo principale: youtube-ai-dream-team (34 SOP, pipeline, canali).</div>
+      <div class="tl-tags"><span class="tag on">Connected</span><span class="tag">PAT</span><span class="tag">3-level Safety</span></div>
+      <div class="btn-row"><a href="https://github.com/YOUR_USERNAME" target="_blank" class="btn btn-p">&#x1F4BB; GitHub</a><a href="https://github.com/YOUR_USERNAME/youtube-ai-dream-team" target="_blank" class="btn btn-s">Repo</a></div>
+    </div>
+  </div>
+
+  <!-- Browser -->
+  <div class="c tool" style="--c-accent:var(--glow3)">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.2)">&#x1F310;</div>
+        <div><div class="tl-title">Browser Integrato</div></div>
+      </div>
+      <div class="tl-desc">Agent Browser headless Rust-based. Naviga, clicca, digita, screenshot. Fallback Node.js. Web scraping, testing, preview.</div>
+      <div class="tl-tags"><span class="tag on">Available</span><span class="tag">Rust</span><span class="tag">Headless</span></div>
+      <div class="btn-row"><a href="https://chat.z.ai" target="_blank" class="btn btn-p">&#x1F310; Apri</a></div>
+    </div>
+  </div>
+
+  <!-- OpenRouter -->
+  <div class="c tool" style="--c-accent:var(--glow2)">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(147,51,234,.12);border:1px solid rgba(147,51,234,.2)">&#x1F9E0;</div>
+        <div><div class="tl-title">OpenRouter</div></div>
+      </div>
+      <div class="tl-desc">Multi-LLM Gateway. Accesso a 200+ modelli: Claude, GPT-4, Gemini, Llama, Mistral, DeepSeek. Routing intelligente + fallback automatico.</div>
+      <div class="tl-tags"><span class="tag on">Active</span><span class="tag">200+ LLM</span><span class="tag">Pay-per-use</span></div>
+      <div class="btn-row"><a href="https://openrouter.ai/models" target="_blank" class="btn btn-p">&#x1F9E0; Modelli</a></div>
+    </div>
+  </div>
+
+  <!-- PiAPI / Kling -->
+  <div class="c tool" style="--c-accent:#ec4899">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(236,72,153,.12);border:1px solid rgba(236,72,153,.2)">&#x1F3AC;</div>
+        <div><div class="tl-title">Kling AI via PiAPI</div></div>
+      </div>
+      <div class="tl-desc">Text-to-Video Kling 2.6. API REST: POST /api/v1/task, GET /api/v1/task/{id}. $0.02-0.05/clip, 5s 16:9. 8 clip generate (56.8 MB).</div>
+      <div class="tl-tags"><span class="tag on">Active</span><span class="tag">Kling 2.6</span><span class="tag">$0.02/clip</span></div>
+      <div class="btn-row"><a href="https://piapi.ai" target="_blank" class="btn btn-p">&#x1F3AC; PiAPI</a></div>
+    </div>
+  </div>
+
+  <!-- Fliki -->
+  <div class="c tool" style="--c-accent:#14b8a6">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.2)">&#x1F3B5;</div>
+        <div><div class="tl-title">Fliki</div></div>
+      </div>
+      <div class="tl-desc">Text-to-Video + TTS con voci AI. Supporta italiano. Integrato nella pipeline Make.com. Potenziale voiceover per video.</div>
+      <div class="tl-tags"><span class="tag on">Active</span><span class="tag">TTS</span><span class="tag">Italiano</span></div>
+      <div class="btn-row"><a href="https://fliki.ai" target="_blank" class="btn btn-p">&#x1F3B5; Fliki</a></div>
+    </div>
+  </div>
+
+  <!-- Creatomate -->
+  <div class="c tool" style="--c-accent:#a855f7">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.2)">&#x1F3A8;</div>
+        <div><div class="tl-title">Creatomate</div></div>
+      </div>
+      <div class="tl-desc">Video template automation. Generazione thumbnails, video brevi, formati social via API REST. Completamento pipeline produttiva.</div>
+      <div class="tl-tags"><span class="tag on">Active</span><span class="tag">Templates</span><span class="tag">REST API</span></div>
+      <div class="btn-row"><a href="https://creatomate.com" target="_blank" class="btn btn-p">&#x1F3A8; Creatomate</a></div>
+    </div>
+  </div>
+
+  <!-- Airtable -->
+  <div class="c tool" style="--c-accent:#eab308">
+    <div class="tl">
+      <div class="tl-top">
+        <div class="tl-icon" style="background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.2)">&#x1F4CA;</div>
+        <div><div class="tl-title">Airtable</div></div>
+      </div>
+      <div class="tl-desc">Database cloud per canali, keyword research, scheduling. Integrazione diretta con pipeline n8n e Make.com.</div>
+      <div class="tl-tags"><span class="tag on">Active</span><span class="tag">Database</span><span class="tag">API v2</span></div>
+      <div class="btn-row"><a href="https://airtable.com" target="_blank" class="btn btn-p">&#x1F4CA; Airtable</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: KEYS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec" id="keys"><div class="sec-title">API Keys — Stato Connessioni</div></div>
+<div class="keys">
+  <div class="krow"><div class="k-dot"></div><div class="k-label">GitHub PAT</div><div class="k-val">github_pat_11BPNUGLA...yJKV</div><span class="tag on">+backup</span></div>
+  <div class="krow"><div class="k-dot"></div><div class="k-label">PiAPI</div><div class="k-val">1b0063bb8a9b...5053</div><span class="tag on">Kling AI</span></div>
+  <div class="krow"><div class="k-dot"></div><div class="k-label">OpenRouter</div><div class="k-val">sk-or-v1-ae9d2d...76e4</div><span class="tag on">Multi-LLM</span></div>
+  <div class="krow"><div class="k-dot"></div><div class="k-label">Fliki</div><div class="k-val">6A05BFFD3A1B...C43</div><span class="tag on">TTS+Video</span></div>
+  <div class="krow"><div class="k-dot"></div><div class="k-label">Creatomate</div><div class="k-val">37b9d2446c64...cc4</div><span class="tag on">Templates</span></div>
+  <div class="krow"><div class="k-dot"></div><div class="k-label">Airtable</div><div class="k-val">patvVLmEA9sU7...aL7</div><span class="tag on">Database</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: SCRIPTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec" id="scripts"><div class="sec-title">Safety System &amp; Scripts</div></div>
+
+<div class="g g2">
+  <!-- GitHub Safety -->
+  <div class="c">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <div style="font-size:20px">&#x1F6E1;&#xFE0F;</div>
+      <div><div style="font-size:15px;font-weight:700">.github_safety.sh</div><div style="font-size:11px;color:var(--text3)">Anti-Disconnection Safety v2.0</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">3 livelli fallback token: .secrets/github_token → env → .env → .bak. Health check, retry con backoff, github_read/write/list.</div>
+    <div class="sbox">source .github_safety.sh    # Carica sistema
+status                         # Report completo
+health_check                   # Verifica connessione
+github_read &lt;PATH&gt;           # Leggi dal repo
+github_write &lt;PATH&gt; &lt;MSG&gt;   # Scrivi sul repo
+save_token &lt;TOKEN&gt;           # Salva in 3 locazioni</div>
+  </div>
+
+  <!-- PiAPI Video -->
+  <div class="c">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <div style="font-size:20px">&#x1F4F9;</div>
+      <div><div style="font-size:15px;font-weight:700">.piapi_video.sh</div><div style="font-size:11px;color:var(--text3)">Kling Video Generation Script</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">Script bash per generazione video Kling. generate_video, check_task, wait_and_download. API: POST /api/v1/task + polling status.</div>
+    <div class="sbox">source .piapi_video.sh            # Carica
+PIAPI_KEY=$(cat .secrets/piapi_api)
+generate_video "prompt" "output.mp4"  # Genera
+check_task &lt;task_id&gt;                 # Status
+wait_and_download &lt;task_id&gt; "file"   # Scarica</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: WORKFLOWS MEMORY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec"><div class="sec-title">Workflows di Memoria — Sistema GitHub-First</div></div>
+<div class="g g3">
+  <div class="c" style="padding:18px 20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">&#x1F4CB; Analisi Video Singolo</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7">URL Video → yt-dlp download → 34 Agenti analisi → 3 Output (PDF + XLSX + Ledger) → Cleanup MP4</div>
+  </div>
+  <div class="c" style="padding:18px 20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">&#x1F504; Analisi Incrementale</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7">Nuovo URL → Leggi ledger esistente → Analisi parziale → Aggiorna ledger (non sovrascrive) → Nuovo report</div>
+  </div>
+  <div class="c" style="padding:18px 20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">&#x1F4CA; Analisi Canale Completo</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7">URL Canale → Scoperta video → Ranking virality → Top 5-10 → Analisi completa → Pattern cross-video</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION: REPO STRUCTURE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sec"><div class="sec-title">Struttura Repository</div></div>
+<div class="c" style="padding:20px 24px">
+  <div class="sbox" style="font-size:11px;line-height:1.9;color:var(--text2)">youtube-ai-dream-team/
+├── dream_team_index.md          ← Indice portatile (chiave AI)
+├── README.md                    ← Documentazione repo
+├── GUIDA_COMPLETA_SETUP.md      ← Guida operativa (1058 righe)
+├── sops/                        ← 34 Agenti SOP
+│   ├── department_a_strategy/       (Agenti 01-06)
+│   ├── department_b_preproduction/  (Agenti 07-11)
+│   ├── department_c_production/     (Agenti 12-16)
+│   ├── department_d_distribution/   (Agenti 17-21)
+│   ├── department_e_engagement/     (Agenti 22-25)
+│   ├── department_f_monetization/   (Agenti 26-30)
+│   └── department_g_orchestration/  (Agenti 31-34)
+├── channels/                    ← Canali smistati
+│   ├── by_niche/ (30+ nicchie)
+│   ├── by_category/ (19 categorie)
+│   ├── by_size/ (5 segmenti)
+│   └── top_views/ (performance)
+├── ledger/master_video_ledger.md
+├── analyses/ (reports/ catalogs/ transcripts/)
+├── assets/ (frames/ thumbnails/)
+├── templates/
+│   ├── make_fliki_youtube_v2.0_validated.json
+│   └── n8n_vip16_validation_report.pdf
+└── tools/generate_validation_report.py</div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  AI Dream Team — Command Center v2.0<br>
+  Generato da Super Z AI &mdash; 20 Maggio 2026<br>
+  <span style="color:var(--text3)">Repo: github.com/YOUR_USERNAME/youtube-ai-dream-team · Privato con GitHub Pages</span>
+</footer>
+
+</div>
+</body>
+</html>

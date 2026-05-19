@@ -1,0 +1,21 @@
+# Secrets — MAI committare
+.env
+.env.*
+.secrets/
+*.key
+*.pem
+*.token
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.log
+*.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp

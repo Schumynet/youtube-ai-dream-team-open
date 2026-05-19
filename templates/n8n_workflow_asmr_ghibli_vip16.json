@@ -1,0 +1,1086 @@
+{
+  "name": "A 16 VIP - Video ASMR - Stile Ghibli (Ottimizzato) [VALIDATED v2.0]",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -320,
+        64
+      ],
+      "id": "51d943d4-471d-49ed-a78a-85b5e41b87cb",
+      "name": "INIZIA PROCESSO"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI",
+          "mode": "list",
+          "cachedResultName": " studio ghibli",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Foglio1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "production_status",
+              "lookupValue": "for production"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -128,
+        64
+      ],
+      "id": "aa590c0c-7c9a-4d09-b870-03e5898259e6",
+      "name": "Idea",
+      "notes": "CONFIGURAZIONE: Collega il tuo account Google Sheets OAuth2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "    {\n      \"scenes\": [\n        {\n          \"prompt\": \"string\"\n        }\n      ]\n    }",
+        "autoFix": "={{ false }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        288
+      ],
+      "id": "53cae9cd-57ee-41a3-921a-9b6d8462e585",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        272
+      ],
+      "id": "23690c2e-8726-466b-adc2-c60f010aa548",
+      "name": "Think1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        272
+      ],
+      "id": "d8e76f5b-d656-4e48-a8f4-e663c5c26cef",
+      "name": "OpenAI Chat Model1",
+      "notes": "CONFIGURAZIONE: Inserisci le tue credenziali OpenAI API Key"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the concept for the new PURE ASMR video.\n\n**Video Title:**\n{{ $json.Title }}\n\n**Context / Global Instructions:**\n{{ $json.GLOBAL_INSTRUCTIONS }}\n\n**MISSION:**\nGenerate the full **41-scene storyboard** based on the Title and Context above.\n1.  **Define the Character DNA** based on the context (or create a fitting one if missing) and apply it to every prompt.\n2.  **Apply the \"Master Structure\"** (Intro -> Prep -> Activity -> Relax) to this specific topic.\n3.  **Focus on ASMR:** Ensure the Audio field is rich with diegetic sounds (No Music).",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## CORE MISSION\nYou are the Lead Director of \"Studio Silence.\" You do not write stories; you write TECHNICAL PROMPTS for an AI Video Generator.\nYour goal is to convert the user's concept into 41 highly structured, engineering-grade prompts.\n\n## 1. STRICT AUDIO RULES (NON-NEGOTIABLE)\n1.  **NO MUSIC:** Absolutely no \"lo-fi beats\", no \"piano\", no \"melodies\".\n2.  **NO VOICEOVER:** No narration, no internal monologue, no talking characters.\n3.  **ONLY DIEGETIC SOUNDS:** You must describe the raw sounds of the world (Wind, Mechanics, Nature, Actions).\n\n## 2. CHARACTER CONSISTENCY PROTOCOL (CRITICAL)\nYou must read the `CHARACTERS LIST` inside the provided **Global Instructions**.\n*   **Rule A:** Never invent new descriptions. Use ONLY the DNA provided.\n*   **Rule B:** If the scene is solitary, paste the [Main Character DNA].\n*   **Rule C:** If the scene involves interaction (e.g., eating together, toasting), you MUST paste BOTH the [Main Character DNA] AND the [Friend DNA].\n    *   *Bad Example:* \"She eats with her friend.\" (Too vague, friend will morph).\n    *   *Good Example:* \"Hana (messy bun, linen overalls) eats soup next to Leo (short blonde hair, green hoodie).\"\n\n## 3. THE 41-SCENE MASTER STRUCTURE\nYou must follow this flow for the 41 scenes:\n*   **Scenes 1-5 (Atmosphere):** [WIDE SHOT]. Establish environment, weather, silence.\n*   **Scenes 6-15 (Preparation):** [MEDIUM SHOT] & [HANDS]. Setting up workspace/ingredients. Crinkling, tapping.\n*   **Scenes 16-30 (Core Activity):** [EXTREME MACRO] & [HANDS]. The physics of the action (steam, bubbles, brush strokes).\n*   **Scenes 31-41 (Result & Peace):** [WIDE SHOT] to [MACRO]. Relaxing, eating/admiring result, evening mood.\n\n## 4. PROMPT STRUCTURE (MANDATORY)\nYou must follow this exact format for every single scene (1 to 41). Do not deviate.\n\n1.  **Visual Header:** \"Studio Ghibli style, 90s anime aesthetic, ASMR focus, [Lighting/Mood].\"\n2.  **Action & DNA:** Describe the action. Immediately insert the Character Name + (FULL DNA STRING).\n3.  **Multi-Shot Directive:** \"Multi-shot sequence: [Wide Shot establishing context]; [Macro Shot of texture/hands]; [Action Shot focusing on movement].\"\n4.  **Audio Layer:** \"Audio: [Layer 1 Ambience] + [Layer 2 Room Tone] + [Layer 3 Specific Action SFX].\"\n5.  **Technical Suffix:** \"--style animation --no photorealism, 3d render, distorted face, text, music, talking, voiceover.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        48
+      ],
+      "id": "5879b5d1-58af-4ebd-934c-9ecb964bba62",
+      "name": "ASMR GHIBLI"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.item.json.output.scenes;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        48
+      ],
+      "id": "bf392e23-7139-4997-993a-3faf05b21ce7",
+      "name": "split_out"
+    },
+    {
+      "parameters": {
+        "options": {
+          "amount": 120,
+          "unit": "seconds"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        64
+      ],
+      "id": "ed13c0cc-e3be-4bc6-911b-d37e574dfed3",
+      "name": "Wait"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "95f3c700-b2a0-4db2-9cd9-70615fb8a36f",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2528,
+        64
+      ],
+      "id": "2aaf648f-cd59-43bc-86fa-88a029d12304",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2768,
+        -16
+      ],
+      "id": "6409665e-d6d4-4f23-9bec-9ea575585876",
+      "name": "GET videos",
+      "notes": "CONFIGURAZIONE: Usa la credenziale 'Header Auth' di Fal.ai"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = $input.all();\nconst validItems = allItems.filter(item => item.json.video_url);\nvalidItems.sort((a, b) => {\n    return (parseInt(a.json.order_id) || 0) - (parseInt(b.json.order_id) || 0);\n});\nconst finalUrls = validItems.map(item => item.json.video_url);\nreturn [{\n    json: {\n        video_urls: finalUrls,\n        total_count: finalUrls.length,\n        debug_ids: validItems.map(i => i.json.order_id).join(', ')\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        48
+      ],
+      "id": "255bb2a8-9fdf-48bc-829c-6ce8107efbd5",
+      "name": "prepara per merge"
+    },
+    {
+      "parameters": {
+        "options": {
+          "amount": 60,
+          "unit": "seconds"
+        }
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2432,
+        304
+      ],
+      "id": "b67cd03f-ddc6-4558-b7c0-0a9158919f00",
+      "name": "Wait3"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.allDone }}",
+                    "rightValue": "false",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    },
+                    "id": "604e6346-b81c-4fb6-ba68-ddc0242654e7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waiting"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7eb43182-891e-4f0b-8159-c628b98a1b8d",
+                    "leftValue": "={{ $json.allDone }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "success"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        2944,
+        304
+      ],
+      "id": "452ab127-a2ee-4dbf-a198-b1d6a3c48479",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "batchSize": 15,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1328,
+        64
+      ],
+      "id": "925a8bc7-4222-4468-8d5b-19f8f74d6a89",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item, index) => {\n  item.json.order_id = index;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        80
+      ],
+      "id": "4eccadaf-7fca-4c67-af5d-d65fd9df9365",
+      "name": "order_id"
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "requestMethod": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 600000
+        },
+        "bodyParametersJson": "={\n  \"model\": \"grok-imagine/text-to-video\",\n  \"input\": {\n    \"prompt\": \"={{ $json.prompt }}\",\n    \"aspect_ratio\": \"16:9\",\n    \"mode\": \"normal\",\n    \"duration\": \"15\",\n    \"resolution\": \"720p\"\n  }\n}",
+        "headerParametersJson": "{}"
+      },
+      "name": "Generate video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1904,
+        304
+      ],
+      "id": "012e9f8d-dd95-4509-92cd-812c941efa64",
+      "notes": "CONFIGURAZIONE: Usa la credenziale 'Header Auth' di Kie.ai"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nlet allDone = true;\nconst tasks = item.json.items;\n\n// Recupera automaticamente l'autenticazione dal nodo precedente senza hardcoding\nconst authHeader = $('Generate video').item?.matchingExecution?.node?.parameters?.headerParametersJson || \"\";\n\nfor (const it of tasks) {\n  if (it.state === 'success' || it.state === 'fail') continue;\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${it.taskId}`,\n      headers: {\n        'Authorization': this.getWorkflowStaticData('global').kie_auth || ''\n      },\n      json: true\n    });\n\n    const apiData = res.data;\n    if (!apiData) { allDone = false; continue; }\n\n    const state = apiData.state;\n    if (state === 'success') {\n      it.state = 'success';\n      let finalUrl = null;\n      try {\n        if (apiData.resultJson) {\n           const parsedResult = typeof apiData.resultJson === 'string' ? JSON.parse(apiData.resultJson) : apiData.resultJson;\n           if (parsedResult && parsedResult.resultUrls && parsedResult.resultUrls.length > 0) { finalUrl = parsedResult.resultUrls[0]; }\n        }\n      } catch (err) { console.log('Errore parsing JSON:', err); }\n      it.video_url = finalUrl;\n    } else if (state === 'fail') {\n      it.state = 'fail';\n      it.error = apiData.failMsg || 'Unknown error';\n    } else {\n      it.state = 'ing';\n      allDone = false;\n    }\n  } catch (error) { allDone = false; }\n}\n\nitem.json.items = tasks;\nitem.json.allDone = allDone;\nreturn [item];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2704,
+        304
+      ],
+      "id": "a2e9b142-b80c-4e43-82e9-d6e3e762235a",
+      "name": "wait for all",
+      "jsCode": "const item = items[0];\nlet allDone = true;\nconst tasks = item.json.items;\nconst MAX_RETRIES = 3;\n\n// [BUG-01 FIX] Usa la credenziale Header Auth dedicata per Kie.ai\n// Configura una credenziale 'httpHeaderAuth' in n8n e assegnala al parametro credentials\n// OPPURE imposta la API key manualmente qui (solo per sviluppo):\nconst KIE_API_KEY = this.getWorkflowStaticData('global').kie_auth || '';\nconst authHeaders = KIE_API_KEY ? { 'Authorization': KIE_API_KEY } : {};\n\nfor (const it of tasks) {\n  if (it.state === 'success') continue;\n  \n  // [BUG-05 FIX] Retry per task falliti\n  if (it.state === 'fail' && (it.retryCount || 0) >= MAX_RETRIES) continue;\n\n  try {\n    const res = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${it.taskId}`,\n      headers: authHeaders,\n      json: true\n    });\n\n    const apiData = res.data;\n    if (!apiData) { allDone = false; continue; }\n\n    const state = apiData.state;\n    if (state === 'success') {\n      it.state = 'success';\n      it.retryCount = 0;\n      let finalUrl = null;\n      try {\n        if (apiData.resultJson) {\n           const parsedResult = typeof apiData.resultJson === 'string' ? JSON.parse(apiData.resultJson) : apiData.resultJson;\n           if (parsedResult && parsedResult.resultUrls && parsedResult.resultUrls.length > 0) { finalUrl = parsedResult.resultUrls[0]; }\n        }\n      } catch (err) { console.log('Errore parsing JSON:', err); }\n      it.video_url = finalUrl;\n    } else if (state === 'fail') {\n      it.retryCount = (it.retryCount || 0) + 1;\n      if (it.retryCount >= MAX_RETRIES) {\n        it.state = 'fail';\n        it.error = apiData.failMsg || 'Unknown error';\n      } else {\n        it.state = 'retry_pending';\n        allDone = false;\n      }\n    } else {\n      it.state = 'ing';\n      allDone = false;\n    }\n  } catch (error) { \n    console.log('Polling error for task', it.taskId, error.message);\n    allDone = false; \n  }\n}\n\nitem.json.items = tasks;\nitem.json.allDone = allDone;\nitem.json.failCount = tasks.filter(t => t.state === 'fail').length;\nitem.json.successCount = tasks.filter(t => t.state === 'success').length;\nreturn [item];"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    items: items.map((item, index) => ({\n      index,\n      prompt: item.json.prompt,\n      order_id: item.json.order_id,\n      taskId: null,\n      state: 'pending',\n      video_url: null\n    }))\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        304
+      ],
+      "id": "992b6029-ae23-4f8e-87a0-57b83ce87b66",
+      "name": "init batch",
+      "jsCode": "return [{\n  json: {\n    items: items.map((item, index) => ({\n      index,\n      prompt: item.json.prompt,\n      order_id: item.json.order_id,\n      taskId: null,\n      state: 'pending',\n      video_url: null,\n      retryCount: 0\n    }))\n  }\n}];\n"
+    },
+    {
+      "parameters": {
+        "jsCode": "const itemsArray = items[0].json.items;\nreturn itemsArray.map(singleItem => {\n    return { json: singleItem };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        304
+      ],
+      "id": "9d66e673-5fea-42ae-bf47-9f6711289d20",
+      "name": "split_out1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const packedItems = items[0].json.items;\nreturn packedItems.map(singleTask => {\n    return {\n        json: {\n            order_id: singleTask.order_id,\n            video_url: singleTask.video_url,\n            prompt: singleTask.prompt,\n            taskId: singleTask.taskId,\n            state: singleTask.state\n        }\n    };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        480
+      ],
+      "id": "c337f844-c41b-4adb-887a-aecc16b3cee4",
+      "name": "Unpack Batch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiResults = items; \nconst originalItems = $('split_out1').all(); \nconst packedItems = apiResults.map((item, index) => {\n    const original = originalItems[index].json;\n    const apiData = item.json.data || item.json;\n    return {\n        taskId: apiData.taskId,\n        order_id: original.order_id,\n        prompt: original.prompt,\n        state: 'pending',\n        video_url: null\n    };\n});\nreturn [{\n    json: {\n        items: packedItems,\n        allDone: false\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        304
+      ],
+      "id": "5314ae48-9b8d-4351-9ed8-cdcd74ab645f",
+      "name": "Merge & Rebuild"
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "requestMethod": "POST",
+        "url": "https://queue.fal.run/fal-ai/ffmpeg-api/merge-videos",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 600000
+        },
+        "bodyParametersJson": "={{ JSON.stringify({ \"video_urls\": $json.video_urls }) }}",
+        "headerParametersJson": "{}"
+      },
+      "name": "crea video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1904,
+        48
+      ],
+      "id": "f3e3013c-7a3a-40bc-8fde-3884546da8f2",
+      "notes": "CONFIGURAZIONE: Usa la credenziale 'Header Auth' di Fal.ai"
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $json.status_url }}",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 600000
+        },
+        "headerParametersJson": "{}"
+      },
+      "name": "Get status3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2336,
+        64
+      ],
+      "id": "e5d4c117-8c14-4faf-a40b-9199a56a778f",
+      "notes": "CONFIGURAZIONE: Usa la credenziale 'Header Auth' di Fal.ai"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ideaData = $('Idea').first().json;\nconst dnaMap = {\n  '__SUSPECT_DNA__': ideaData.Suspect_DNA,     \n  '__OFFICER_DNA__': ideaData.Officer_DNA, \n  '__WITNESS_DNA__': ideaData.Witness_DNA    \n};\nfunction extractName(dnaString) {\n  if (!dnaString) return \"the person\";\n  let name = dnaString.replace(/^(Primary Officer|Secondary Officer|Subject S1|Subject S2|Witness|Manager|Ofc\\.|Officer):\\s*/i, '');\n  name = name.split(/[(\\:,]/)[0].trim();\n  return name;\n}\nconst items = $input.all();\nreturn items.map(item => {\n  let prompt = item.json.prompt;\n  if (!prompt) return item;\n  for (const [placeholder, fullDna] of Object.entries(dnaMap)) {\n    if (!fullDna) continue;\n    let cleanFullDna = fullDna.replace(/^(Primary Officer|Secondary Officer|Subject S1|Subject S2|Witness|Manager|Ofc\\.|Officer):\\s*/i, '');\n    const shortName = extractName(fullDna);\n    let counter = 0;\n    prompt = prompt.replace(new RegExp(placeholder, 'g'), () => {\n      counter++;\n      return counter === 1 ? cleanFullDna : shortName;\n    });\n  }\n  return {\n    json: {\n      ...item.json,\n      prompt: prompt\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        64
+      ],
+      "id": "77c618ea-3ab2-4ce2-8a27-22ac76bd6362",
+      "name": "DNA placeholders",
+      "jsCode": "const ideaData = $('Idea').first().json;\n// [BUG-04 FIX] Nomi DNA coerenti con contesto ASMR Ghibli\nconst dnaMap = {\n  '__MAIN_CHARACTER_DNA__': ideaData.Main_Character_DNA || ideaData.Main_Character,\n  '__FRIEND_DNA__': ideaData.Friend_DNA || ideaData.Friend,\n  '__CHARACTER_DNA__': ideaData.Character_DNA || ideaData.CHARACTER_DNA\n};\nfunction extractName(dnaString) {\n  if (!dnaString) return \"the character\";\n  let name = dnaString.replace(/^(Main Character|Friend|Character)\\s*[:\\-]\\s*/i, '');\n  name = name.split(/[(,:]/)[0].trim();\n  return name;\n}\nconst items = $input.all();\nreturn items.map(item => {\n  let prompt = item.json.prompt;\n  if (!prompt) return item;\n  for (const [placeholder, fullDna] of Object.entries(dnaMap)) {\n    if (!fullDna) continue;\n    let cleanFullDna = fullDna.replace(/^(Main Character|Friend|Character)\\s*[:\\-]\\s*/i, '');\n    const shortName = extractName(fullDna);\n    let counter = 0;\n    prompt = prompt.replace(new RegExp(placeholder, 'g'), () => {\n      counter++;\n      return counter === 1 ? cleanFullDna : shortName;\n    });\n  }\n  return {\n    json: {\n      ...item.json,\n      prompt: prompt\n    }\n  };\n});"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI",
+          "mode": "list",
+          "cachedResultName": " studio ghibli",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Foglio1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eIkDfvFPLDWMy_3PmJKDmX3eZpKpjJWhObCZoSMCWVQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Idea').first().json.id }}",
+            "production_status": "done",
+            "Video_url": "={{ $json.video.url }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2976,
+        -32
+      ],
+      "id": "9ca2dc6e-5bbd-42cf-95f4-50a3c0e5ea12",
+      "name": "URL NOSTRO"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        16,
+        -496
+      ],
+      "id": "a7e093ee-f0ee-405b-b254-9eaa605d51db",
+      "name": "lavori precedenti"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Foglio1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tuxeK9o-SzgCUWEAaM0VfRyr0Hrz6iOrGgVd8lmqOtI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ Math.max(0, ...$('lavori precedenti').all().map(item => parseInt(item.json.id) || 0)) + 1 }}",
+            "Title": "={{ $json.output.Title }}",
+            "GLOBAL_INSTRUCTIONS": "={{ $json.output.GLOBAL_INSTRUCTIONS }}",
+            "caption": "={{ $json.output.Caption }}",
+            "thumbnail_prompt": "={{ $json.output.Thumbnail_Prompt }}",
+            "production_status": "for production"
+          },
+          "matchingColumns": [
+            "id"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        688,
+        -496
+      ],
+      "id": "07631d83-7387-49e7-b84e-f1a4ae7f8805",
+      "name": "nuove idee"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Title"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -496
+      ],
+      "id": "6450f5f6-b13e-4871-9282-481a493e343c",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"custom_idea\": \"\"\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -496
+      ],
+      "id": "ae571c8c-7919-40d2-8397-68f7d51f0fcc",
+      "name": "idea mia"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Title\": \"🍵 Rainy Day Tea Ceremony | Studio Ghibli ASMR | No Talking\",\n  \"Caption\": \"Watch Hana prepare a traditional tea ceremony...\",\n  \"Thumbnail_Prompt\": \"Studio Ghibli style...\",\n  \"GLOBAL_INSTRUCTIONS\": \"CHARACTERS LIST...\"\n}",
+        "autoFix": "={{ false }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        -304
+      ],
+      "id": "82d50b56-e42c-430f-b6c4-cb482adeb286",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        -304
+      ],
+      "id": "3bc4fe0d-3b4b-44b0-ad4f-ebb9dfa7cbf8",
+      "name": "Think4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        -304
+      ],
+      "id": "686759d7-6fce-4b19-a4f8-3a52b24a1069",
+      "name": "OpenAI Chat Model4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## INPUT DATA\n- **HISTORY:** {{ $json.Title ? $json.Title.join(', ') : \"None\" }}\n- **USER OVERRIDE:** \"{{ $('idea mia').first().json.custom_idea }}\"\n\n## YOUR MISSION\n1. **OVERRIDE CHECK:** If USER OVERRIDE is not empty, use it as the base concept. Skip variety rules but still apply all format rules.\n2. **VARIETY CHECK:** If no override, generate a concept that is DIFFERENT from all titles in HISTORY. Do NOT repeat themes, settings, or activities.\n3. **CONCEPT CREATION:** Invent a cozy, atmospheric ASMR activity set in a Studio Ghibli-inspired world.\n\n## FORMAT RULES (MANDATORY)\nYou MUST output EXACTLY this JSON structure:\n{\n  \"Title\": \"Short catchy title (e.g. 'Rainy Day Tea Ceremony | Studio Ghibli ASMR | No Talking')\",\n  \"Caption\": \"2-3 sentence YouTube caption describing the video mood and content\",\n  \"Thumbnail_Prompt\": \"Detailed prompt for thumbnail image in Studio Ghibli style\",\n  \"GLOBAL_INSTRUCTIONS\": \"CHARACTERS LIST:\\n- Main Character: [Name] ([visual description], [clothing], [hair]).\\n- Friend (optional): [Name] ([visual description], [clothing], [hair]).\\n\\nSETTING: [location and atmosphere description]\\n\\nMOOD: [cozy/rainy/sunny/snowy/autumn]\"\n}\n\n## CHARACTER DNA RULES\n- Create exactly 1-2 characters with DETAILED visual descriptions (hair color, length, style; clothing type, color; accessories).\n- DNA must be specific enough to maintain consistency across 41 AI-generated scenes.\n- Characters should feel like they belong in a Studio Ghibli film.\n\n## CONTENT GUIDELINES\n- Activity must be suitable for PURE ASMR (no talking, no music, only diegetic sounds).\n- Setting must be cozy and atmospheric (kitchen, garden, workshop, library, forest, etc.).\n- Mood should evoke calm, warmth, and nostalgia.\n- Avoid generic themes; be creative and specific (e.g. \"making handmade candles\" not \"crafting\").",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the Creative Director of \"Studio Silence,\" a YouTube channel specializing in PURE ASMR content in a Studio Ghibli art style.\n\n## CORE PRINCIPLES:\n1. NO TALKING - ever. No voiceover, no narration, no dialogue.\n2. NO MUSIC - only diegetic sounds (nature, objects, actions).\n3. COZY ATMOSPHERE - every concept must evoke warmth and calm.\n4. VISUAL CONSISTENCY - characters must have detailed, unchanging DNA.\n5. CREATIVE VARIETY - never repeat the same concept or theme.\n\n## CHARACTER DNA SYSTEM:\nEvery video has 1-2 characters defined by detailed physical descriptions. These DNA strings are embedded in every scene prompt to ensure the AI generates consistent characters across all 41 scenes.\n\n## OUTPUT:\nYou MUST output valid JSON matching the exact schema provided. No extra text, no markdown, just the JSON object."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        -496
+      ],
+      "id": "671415b0-1cff-4833-8a65-ebabf68ee55d",
+      "name": "idea generator"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20,
+              "triggerAtMinute": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        -496
+      ],
+      "id": "b5efcc5b-1fb9-41b4-b9d6-70a9e9c08e17",
+      "name": "CREA IDEA"
+    }
+  ],
+  "connections": {
+    "INIZIA PROCESSO": {
+      "main": [
+        [
+          {
+            "node": "Idea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "ASMR GHIBLI",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think1": {
+      "ai_tool": [
+        [
+          {
+            "node": "ASMR GHIBLI",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ASMR GHIBLI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Idea": {
+      "main": [
+        [
+          {
+            "node": "ASMR GHIBLI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "split_out": {
+      "main": [
+        [
+          {
+            "node": "DNA placeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get status3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "GET videos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara per merge": {
+      "main": [
+        [
+          {
+            "node": "crea video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "wait for all",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unpack Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "prepara per merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "init batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "order_id": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "Merge & Rebuild",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wait for all": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "init batch": {
+      "main": [
+        [
+          {
+            "node": "split_out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "split_out1": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unpack Batch": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge & Rebuild": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crea video": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get status3": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DNA placeholders": {
+      "main": [
+        [
+          {
+            "node": "order_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ASMR GHIBLI": {
+      "main": [
+        [
+          {
+            "node": "split_out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET videos": {
+      "main": [
+        [
+          {
+            "node": "URL NOSTRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "lavori precedenti": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "idea generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "idea mia": {
+      "main": [
+        [
+          {
+            "node": "lavori precedenti",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "idea generator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think4": {
+      "ai_tool": [
+        [
+          {
+            "node": "idea generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "idea generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "idea generator": {
+      "main": [
+        [
+          {
+            "node": "nuove idee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREA IDEA": {
+      "main": [
+        [
+          {
+            "node": "idea mia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "validated"
+    },
+    {
+      "name": "asmr-ghibli"
+    },
+    {
+      "name": "vip16"
+    }
+  ]
+}

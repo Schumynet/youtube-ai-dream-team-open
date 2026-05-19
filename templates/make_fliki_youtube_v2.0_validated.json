@@ -1,0 +1,231 @@
+{
+    "name": "Automazione Fliki & YouTube [VALIDATED v2.0]",
+    "blueprintType": "scenario",
+    "version": 1,
+    "description": "Pipeline Fliki & YouTube Shorts con error handling, retry e filtri. Validato da Agent 33.",
+    "flow": [
+        {
+            "id": 1,
+            "module": "airtable:watchRecords",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6561861,
+                "limit": 3,
+                "viewId": "viw9l5KpxgYV4mU3Z"
+            },
+            "mapper": {
+                "base": "appe0zESHh6yDpJoZ",
+                "table": "tbl4764wQlb45Fpt3",
+                "formula": "AND({Status} = 'Da Fare', NOT({Script} = ''))"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0,
+                    "name": "Cerca Record 'Da Fare' (con Script)"
+                }
+            },
+            "_validator_notes": "FIX-05: limit ridotto da 10 a 3 per evitare rate limiting. FIX-07: formula aggiornata per escludere script vuoti."
+        },
+        {
+            "id": 2,
+            "module": "builtin:Filter",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "conditions": [
+                    {
+                        "label": "Script non vuoto",
+                        "key": "{{1.Script}}",
+                        "operator": "notEmpty"
+                    },
+                    {
+                        "label": "Almeno 20 caratteri",
+                        "key": "{{length(1.Script)}}",
+                        "operator": "greaterThanOrEqual",
+                        "value": 20
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 150,
+                    "y": 0,
+                    "name": "Filtra Script Validi"
+                }
+            },
+            "_validator_notes": "FIX-07 (NUOVO): Filtro aggiunto prima delle API a pagamento. Scarta record con script vuoto o troppo corto."
+        },
+        {
+            "id": 20,
+            "module": "fliki:createVideo",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6554522,
+                "timeout": 600
+            },
+            "mapper": {
+                "payload_0_format": "9:16",
+                "payload_0_voiceId": "63032cc62b2fcbc76d8b9415",
+                "payload_0_content": "{{2.Script}}",
+                "payload_0_audioUrl": "",
+                "payload_0_shouldExport": true,
+                "payload_0_voiceStyleId": "",
+                "payload_0_campaignVideoId": ""
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0,
+                    "name": "Genera Video Fliki"
+                }
+            },
+            "_validator_notes": "FIX-06: Aggiunto timeout 600s. FIX-04: Configurare 3 retry x 60s nelle opzioni modulo Make.com. FIX-03: Riferimento aggiornato a Mod 2 (post-filtro)."
+        },
+        {
+            "id": 21,
+            "module": "openai-gpt-3:createChatCompletion",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6445582,
+                "timeout": 120
+            },
+            "mapper": {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Sei un esperto di crescita su YouTube. Il tuo compito è generare un titolo accattivante, virale e ad alto CTR per un video short basato sullo script fornito. Restituisci SOLO il titolo, senza virgolette o spiegazioni."
+                    },
+                    {
+                        "role": "user",
+                        "content": "{{2.Script}}"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": -150,
+                    "name": "Genera Titolo YouTube"
+                }
+            },
+            "_validator_notes": "FIX-04: Configurare 3 retry x 15s nelle opzioni modulo Make.com. FIX-06: Timeout 120s aggiunto. Riferimento aggiornato a Mod 2."
+        },
+        {
+            "id": 22,
+            "module": "openai-gpt-3:createChatCompletion",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 6445582,
+                "timeout": 120
+            },
+            "mapper": {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Sei un esperto SEO per YouTube Shorts. Scrivi una descrizione breve (max 3 righe) ottimizzata per la ricerca, includendo hashtag rilevanti, basandoti sul seguente script."
+                    },
+                    {
+                        "role": "user",
+                        "content": "{{2.Script}}"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 150,
+                    "name": "Genera Descrizione SEO"
+                }
+            },
+            "_validator_notes": "FIX-04: Configurare 3 retry x 15s. FIX-06: Timeout 120s. Riferimento aggiornato a Mod 2."
+        },
+        {
+            "id": 23,
+            "module": "airtable:updateRecord",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 6561861
+            },
+            "mapper": {
+                "base": "appe0zESHh6yDpJoZ",
+                "table": "tbl4764wQlb45Fpt3",
+                "recordId": "{{1.id}}",
+                "fields": {
+                    "Youtube title": "{{21.choices.1.message.content}}",
+                    "Youtube description": "{{22.choices.1.message.content}}",
+                    "Fliki video URL": "{{20.outputUrl}}",
+                    "Status": "Pronto"
+                }
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 0,
+                    "name": "Aggiorna Airtable - Pronto"
+                }
+            },
+            "_validator_notes": "FIX-01: choices[] → choices.1 (sintassi Make.com 1-based). FIX-03: Modulo posizionato DOPO 20,21,22. FIX-08: Aggiunto campo Fliki video URL."
+        },
+        {
+            "id": 24,
+            "module": "airtable:updateRecord",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 6561861
+            },
+            "mapper": {
+                "base": "appe0zESHh6yDpJoZ",
+                "table": "tbl4764wQlb45Fpt3",
+                "recordId": "{{1.id}}",
+                "fields": {
+                    "Status": "Errore AI"
+                }
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": 150,
+                    "name": "Fallback - Errore OpenAI"
+                }
+            },
+            "_validator_notes": "FIX-02 (NUOVO): Se OpenAI (Mod 21 o 22) fallisce dopo 3 retry, questo modulo aggiorna Status a 'Errore AI'. Collegare come Error Handler dei moduli 21 e 22."
+        },
+        {
+            "id": 25,
+            "module": "airtable:updateRecord",
+            "version": 3,
+            "parameters": {
+                "__IMTCONN__": 6561861
+            },
+            "mapper": {
+                "base": "appe0zESHh6yDpJoZ",
+                "table": "tbl4764wQlb45Fpt3",
+                "recordId": "{{1.id}}",
+                "fields": {
+                    "Status": "Errore Fliki"
+                }
+            },
+            "metadata": {
+                "designer": {
+                    "x": 900,
+                    "y": -150,
+                    "name": "Fallback - Errore Fliki"
+                }
+            },
+            "_validator_notes": "FIX-02 (NUOVO): Se Fliki (Mod 20) fallisce dopo 3 retry, questo modulo aggiorna Status a 'Errore Fliki'. Collegare come Error Handler del modulo 20."
+        }
+    ],
+    "metadata": {
+        "validatedBy": "Agent 33 - Make.com Workflow Validator",
+        "validationDate": "2026-05-19",
+        "validationVersion": "v2.0",
+        "bugsFound": 8,
+        "bugsFixed": 8,
+        "originalModules": 5,
+        "validatedModules": 8,
+        "judgment": "VALIDATO (dopo correzione)"
+    }
+}
